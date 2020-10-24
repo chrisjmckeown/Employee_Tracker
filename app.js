@@ -85,12 +85,12 @@ async function manageRoles() {
                 var { res: list } = await getAllRoles();
                 var titles = list.map(item => item.title);
                 var { item } = await selectItemPrompt("Please select a Department to edit:", titles);
-                var id = list.filter((x) => x.title === item)[0].id;
+                var found = list.filter((x) => x.title === item)[0];
                 var startingSalary = list.filter((x) => x.title === item)[0].salary;
                 var { result: title } = await getRoleDefaultStringPrompt("Please enter a Title:", item, list);
                 var { result: salary } = await getDefaultIntPrompt("Please enter a Salary:", startingSalary);
                 var department_id = await getRoleDepartment();
-                await updateRole(id, title.trim(), salary, department_id);
+                await updateRole(found.id, title.trim(), salary, department_id);
                 break;
             case "Delete":
                 var { res: list } = await getAllRoles();
@@ -561,17 +561,16 @@ async function fixEmployeeManagers(id) {
 async function viewAllEmployeesByDepartment() {
     return new Promise((resolve) => {
 
-        var query = 'SELECT e.id as "ID", e.first_name as "First Name", e.last_name as "Last Name", d.Name as "Department", r.title as "Title", r.salary as "Salary", CONCAT(m.first_name, " ", m.last_name) AS Manager '
-            + 'FROM employee e LEFT JOIN role r '
-            + 'ON e.role_id = r.id '
-            + 'LEFT JOIN employee m '
-            + 'ON m.id = e.manager_id '
-            + 'LEFT JOIN department d '
-            + 'ON d.id = r.department_id';
+        var query = 'SELECT d.Name as "Department", e.first_name as "First Name", e.last_name as "Last Name" '
+            + 'FROM department d LEFT JOIN role r '
+            + 'ON d.id = r.department_id '
+            + 'LEFT JOIN employee e '
+            + 'ON r.id = e.role_id '
+            + 'ORDER BY d.Name';
         pool.query(query,
             (err, res) => {
                 if (err) throw err;
-                console.log("\n");
+                console.log("\nEmployees By Department\n");
                 console.table(res);
                 resolve({ result: !err });
             });
@@ -581,17 +580,14 @@ async function viewAllEmployeesByDepartment() {
 async function viewAllEmployeesByManager() {
     return new Promise((resolve) => {
 
-        var query = 'SELECT e.id as "ID", e.first_name as "First Name", e.last_name as "Last Name", d.Name as "Department", r.title as "Title", r.salary as "Salary", CONCAT(m.first_name, " ", m.last_name) AS Manager '
-            + 'FROM employee e LEFT JOIN role r '
-            + 'ON e.role_id = r.id '
-            + 'LEFT JOIN employee m '
+        var query = 'SELECT CONCAT(m.first_name, " ", m.last_name) AS Manager, CONCAT(e.first_name, " ", e.last_name) as Employee  '
+            + 'FROM employee m LEFT JOIN employee e '
             + 'ON m.id = e.manager_id '
-            + 'LEFT JOIN department d '
-            + 'ON d.id = r.department_id';
+            + 'ORDER BY e.manager_id, m.first_name';
         pool.query(query,
             (err, res) => {
                 if (err) throw err;
-                console.log("\n");
+                console.log("\nEmployees By Manager\n");
                 console.table(res);
                 resolve({ result: !err });
             });
@@ -601,17 +597,14 @@ async function viewAllEmployeesByManager() {
 async function viewTotalBudgetByDepartment() {
     return new Promise((resolve) => {
 
-        var query = 'SELECT e.id as "ID", e.first_name as "First Name", e.last_name as "Last Name", d.Name as "Department", r.title as "Title", r.salary as "Salary", CONCAT(m.first_name, " ", m.last_name) AS Manager '
-            + 'FROM employee e LEFT JOIN role r '
-            + 'ON e.role_id = r.id '
-            + 'LEFT JOIN employee m '
-            + 'ON m.id = e.manager_id '
-            + 'LEFT JOIN department d '
-            + 'ON d.id = r.department_id';
+        var query = 'SELECT d.Name as "Department", SUM(r.salary) as "Salary" '
+            + 'FROM department d LEFT JOIN role r '
+            + 'ON d.id = r.department_id '
+            + 'GROUP BY d.Name';
         pool.query(query,
             (err, res) => {
                 if (err) throw err;
-                console.log("\n");
+                console.log("\nTotal Budget By Department \n");
                 console.table(res);
                 resolve({ result: !err });
             });
