@@ -10,22 +10,22 @@ async function manageDepartments(pool) {
                 await viewAllDepartments(pool);
                 break;
             case "Add":
-                var { res: list } = await getAllDepartments(pool);
-                var { result: name } = await getDepartmentPrompt(list);
+                var { res: departments } = await getAllDepartments(pool);
+                var { result: name } = await getDepartmentPrompt(departments);
                 await addDepartment(pool, name.trim());
                 break;
             case "Edit":
-                var { res: list } = await getAllDepartments(pool);
-                var { item } = await commonPrompts.selectItemPrompt("Please select a Department to rename:", list);
-                var id = list.filter((x) => x.name === item)[0].id;
-                var { result: name } = await getDepartmentWithDefaultPrompt(item, list);
-                await updateDepartment(pool, id, name.trim());
+                var { res: departments } = await getAllDepartments(pool);
+                var { item } = await commonPrompts.selectItemPrompt("Please select a Department to rename:", departments);
+                var found = departments.filter((x) => x.name === item)[0];
+                var { result: name } = await getDepartmentWithDefaultPrompt(item, departments);
+                await updateDepartment(pool, found.id, name.trim());
                 break;
             case "Delete":
-                var { res: list } = await getAllDepartments(pool);
-                var { item } = await commonPrompts.selectItemPrompt("Please select a Department to delete:", list);
-                var id = list.filter((x) => x.name === item)[0].id;
-                await deleteDepartment(pool, id);
+                var { res: departments } = await getAllDepartments(pool);
+                var { item } = await commonPrompts.selectItemPrompt("Please select a Department to delete:", departments);
+                var found = departments.filter((x) => x.name === item)[0];
+                await deleteDepartment(pool, found.id);
                 break;
             default:
                 return;

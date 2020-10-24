@@ -11,29 +11,29 @@ async function manageRoles(pool) {
                 await viewAllRoles(pool);
                 break;
             case "Add":
-                var { res: list } = await getAllRoles(pool);
-                var { result: title } = await getRolePrompt(list);
+                var { res: roles } = await getAllRoles(pool);
+                var { result: title } = await getRolePrompt(roles);
                 var { result: salary } = await getSalaryPrompt();
                 var department_id = await getRoleDepartment(pool);
                 await addRole(pool, title.trim(), salary, department_id);
                 break;
             case "Edit":
-                var { res: list } = await getAllRoles(pool);
-                var titles = list.map(item => item.title);
+                var { res: roles } = await getAllRoles(pool);
+                var titles = roles.map(item => item.title).sort();
                 var { item } = await commonPrompts.selectItemPrompt("Please select a Department to edit:", titles);
-                var found = list.filter((x) => x.title === item)[0];
-                var startingSalary = list.filter((x) => x.title === item)[0].salary;
-                var { result: title } = await getRoleWithDefaultPrompt(item, list);
+                var found = roles.filter((x) => x.title === item)[0];
+                var startingSalary = roles.filter((x) => x.title === item)[0].salary;
+                var { result: title } = await getRoleWithDefaultPrompt(item, roles);
                 var { result: salary } = await getSalaryWithDefaultPrompt(startingSalary);
                 var department_id = await getRoleDepartment(pool);
                 await updateRole(pool, found.id, title.trim(), salary, department_id);
                 break;
             case "Delete":
-                var { res: list } = await getAllRoles(pool);
-                var titles = list.map(item => item.title);
+                var { res: roles } = await getAllRoles(pool);
+                var titles = roles.map(item => item.title).sort();
                 var { item } = await commonPrompts.selectItemPrompt("Please select a Role to delete:", titles);
-                var id = list.filter((x) => x.title === item)[0].id;
-                await deleteRole(pool, id);
+                var found = roles.filter((x) => x.title === item)[0];
+                await deleteRole(pool, found.id);
                 break;
             default:
                 return;
@@ -43,7 +43,7 @@ async function manageRoles(pool) {
 
 async function getRoleDepartment(pool) {
     var { res: departments } = await manageDepartments.getAllDepartments(pool);
-    var deps = ["None", ...departments.map(item => item.name)];
+    var deps = ["None", ...departments.map(item => item.name).sort()];
     var { item: department } = await commonPrompts.selectItemPrompt("Please select a Department:", deps);
     var department_id = null;
     if (department !== "None") {

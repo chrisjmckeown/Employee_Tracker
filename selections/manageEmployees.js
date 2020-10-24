@@ -19,7 +19,7 @@ async function manageEmployees(pool) {
                 break;
             case "Edit":
                 var { res: list } = await getAllEmployees(pool);
-                var employees = list.map(item => item.first_name + " " + item.last_name);
+                var employees = list.map(item => item.first_name + " " + item.last_name).sort();
                 var { item } = await commonPrompts.selectItemPrompt("Please select a Employee to edit:", employees);
                 var found = list.filter((x) => (x.first_name + " " + x.last_name) === item)[0];
 
@@ -31,11 +31,11 @@ async function manageEmployees(pool) {
                 break;
             case "Delete":
                 var { res: list } = await getAllEmployees(pool);
-                var employees = list.map(item => item.first_name + " " + item.last_name);
+                var employees = list.map(item => item.first_name + " " + item.last_name).sort();
                 var { item } = await commonPrompts.selectItemPrompt("Please select an Employee to delete:", employees);
                 console.log(item);
-                var id = list.filter((x) => (x.first_name + " " + x.last_name) === item)[0].id;
-                await deleteEmployee(pool, id);
+                var found = list.filter((x) => (x.first_name + " " + x.last_name) === item)[0];
+                await deleteEmployee(pool, found.id);
                 break;
             default:
                 return;
@@ -45,7 +45,7 @@ async function manageEmployees(pool) {
 
 async function getEmployeeManager(pool) {
     var { res: employees } = await getAllEmployees(pool);
-    var managers = ["None", ...employees.map(item => item.first_name + " " + item.last_name)];
+    var managers = ["None", ...employees.map(item => item.first_name + " " + item.last_name).sort()];
     var { item: manager } = await commonPrompts.selectItemPrompt("Please select a Manager:", managers);
     var manager_id = null;
     if (manager !== "None") {
@@ -56,7 +56,7 @@ async function getEmployeeManager(pool) {
 
 async function getEmployeeRole(pool) {
     var { res: list } = await manageRoles.getAllRoles(pool);
-    var roles = ["None", ...list.map(item => item.title)];
+    var roles = ["None", ...list.map(item => item.title).sort()];
     var { item: role } = await commonPrompts.selectItemPrompt("Please select a Role:", roles);
     var role_id = null;
     if (role !== "None") {
