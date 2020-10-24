@@ -14,7 +14,7 @@ async function manageRoles(pool) {
                 var { res: roles } = await getAllRoles(pool);
                 var { result: title } = await getRolePrompt(roles);
                 var { result: salary } = await getSalaryPrompt();
-                var department_id = await getRoleDepartment(pool);
+                var department_id = await getRoleDepartment(pool, 0);
                 await addRole(pool, title.trim(), salary, department_id);
                 break;
             case "Edit":
@@ -25,7 +25,7 @@ async function manageRoles(pool) {
                 var startingSalary = roles.filter((x) => x.title === item)[0].salary;
                 var { result: title } = await getRoleWithDefaultPrompt(item, roles);
                 var { result: salary } = await getSalaryWithDefaultPrompt(startingSalary);
-                var department_id = await getRoleDepartment(pool);
+                var department_id = await getRoleDepartment(pool, found.department_id);
                 await updateRole(pool, found.id, title.trim(), salary, department_id);
                 break;
             case "Delete":
@@ -41,13 +41,18 @@ async function manageRoles(pool) {
     }
 }
 
-async function getRoleDepartment(pool) {
-    var { res: departments } = await manageDepartments.getAllDepartments(pool);
-    var deps = ["None", ...departments.map(item => item.name).sort()];
-    var { item: department } = await commonPrompts.selectItemPrompt("Please select a Department:", deps);
+async function getRoleDepartment(pool, department_id) {
+    var { res: list } = await manageDepartments.getAllDepartments(pool);
+    var found = list.filter((x) => x.id === department_id);
+    var departments = ["None", ...list.map(item => item.name).sort()];
+    if (found.length > 0) {
+        var { item: department } = await commonPrompts.selectItemWithDefaultPrompt("Please select a Department:", departments, found[0].name);
+    } else {
+        var { item: department } = await commonPrompts.selectItemPrompt("Please select a Department:", departments);
+    }
     var department_id = null;
     if (department !== "None") {
-        department_id = departments.filter((x) => x.name === department)[0].id;
+        department_id = list.filter((x) => x.name === department)[0].id;
     }
     return department_id;
 }

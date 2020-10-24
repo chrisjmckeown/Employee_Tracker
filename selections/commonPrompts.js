@@ -30,7 +30,22 @@ function selectItemPrompt(message, items) {
     ]);
 }
 
+function selectItemWithDefaultPrompt(message, items, defaultValue) {
+    return inquirer.prompt([
+        {
+            type: "list",
+            message: message,
+            name: "item",
+            default: defaultValue,
+            choices: [
+                ...items
+            ]
+        }
+    ]);
+}
+
 module.exports = {
     manageSelectionPrompt,
-    selectItemPrompt
+    selectItemPrompt,
+    selectItemWithDefaultPrompt
 }
