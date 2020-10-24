@@ -10,7 +10,7 @@ const databaseConfig = {
 };
 
 const pool = mysql.createPool(databaseConfig);
-
+welcomeScreen();
 start();
 async function start() {
     while (true) {
@@ -46,14 +46,14 @@ async function manageDepartments() {
             case "Add":
                 var { res: list } = await getAllDepartments();
                 var { result: name } = await getDepartmentStringPrompt("Please enter a Name:", list);
-                await addDepartment(name);
+                await addDepartment(name.trim());
                 break;
             case "Edit":
                 var { res: list } = await getAllDepartments();
                 var { item } = await selectItemPrompt("Please select a Department to rename:", list);
                 var id = list.filter((x) => x.name === item)[0].id;
                 var { result: name } = await getDepartmentDefaultStringPrompt("Please enter a Title:", item, list);
-                await updateDepartment(id, name);
+                await updateDepartment(id, name.trim());
                 break;
             case "Delete":
                 var { res: list } = await getAllDepartments();
@@ -79,7 +79,7 @@ async function manageRoles() {
                 var { result: title } = await getRoleStringPrompt("Please enter a Title:", list);
                 var { result: salary } = await getIntPrompt("Please enter a Salary:");
                 var department_id = await getRoleDepartment();
-                await addRole(title, salary, department_id);
+                await addRole(title.trim(), salary, department_id);
                 break;
             case "Edit":
                 var { res: list } = await getAllRoles();
@@ -90,7 +90,7 @@ async function manageRoles() {
                 var { result: title } = await getRoleDefaultStringPrompt("Please enter a Title:", item, list);
                 var { result: salary } = await getDefaultIntPrompt("Please enter a Salary:", startingSalary);
                 var department_id = await getRoleDepartment();
-                await updateRole(id, title, salary, department_id);
+                await updateRole(id, title.trim(), salary, department_id);
                 break;
             case "Delete":
                 var { res: list } = await getAllRoles();
@@ -128,7 +128,7 @@ async function manageEmployees() {
                 var { result: last_name } = await getStringPrompt("Please enter a Last Name:");
                 var role_id = await getEmployeeRole();
                 var manager_id = await getEmployeeManager();
-                await addEmployee(first_name, last_name, role_id, manager_id);
+                await addEmployee(first_name.trim(), last_name.trim(), role_id, manager_id);
                 break;
             case "Edit":
                 var { res: list } = await getAllEmployees();
@@ -140,7 +140,7 @@ async function manageEmployees() {
                 var { result: last_name } = await getDefaultStringPrompt("Please enter a Last Name:", found.last_name);
                 var role_id = await getEmployeeRole();
                 var manager_id = await getEmployeeManager();
-                await updateEmployee(found.id, first_name, last_name, role_id, manager_id);
+                await updateEmployee(found.id, first_name.trim(), last_name.trim(), role_id, manager_id);
                 break;
             case "Delete":
                 var { res: list } = await getAllEmployees();
@@ -209,7 +209,7 @@ function vewSelectionPrompt() {
             choices: [
                 "View All Employees By Department",
                 "View All Employees By Manager",
-                "View Total budget By Department",
+                "View Total Budget By Department",
                 "Exit Reports"
             ]
         }
@@ -466,11 +466,13 @@ async function getAllEmployees() {
 async function viewAllEmployees() {
     return new Promise((resolve) => {
 
-        var query = 'SELECT e.id as "ID", e.first_name as "First Name", e.last_name as "Last Name", r.title as "Title", CONCAT(m.first_name, ", ", m.last_name) AS Manager '
+        var query = 'SELECT e.id as "ID", e.first_name as "First Name", e.last_name as "Last Name", d.Name as "Department", r.title as "Title", r.salary as "Salary", CONCAT(m.first_name, " ", m.last_name) AS Manager '
             + 'FROM employee e LEFT JOIN role r '
             + 'ON e.role_id = r.id '
             + 'LEFT JOIN employee m '
-            + 'ON m.id = e.manager_id';
+            + 'ON m.id = e.manager_id '
+            + 'LEFT JOIN department d '
+            + 'ON d.id = r.department_id';
         pool.query(query,
             (err, res) => {
                 if (err) throw err;
@@ -559,15 +561,13 @@ async function fixEmployeeManagers(id) {
 async function viewAllEmployeesByDepartment() {
     return new Promise((resolve) => {
 
-        var query = 'SELECT e.id as "ID", e.first_name as "First Name", e.last_name as "Last Name", r.title as "Title", CONCAT(m.first_name, ", ", m.last_name) AS Manager '
+        var query = 'SELECT e.id as "ID", e.first_name as "First Name", e.last_name as "Last Name", d.Name as "Department", r.title as "Title", r.salary as "Salary", CONCAT(m.first_name, " ", m.last_name) AS Manager '
             + 'FROM employee e LEFT JOIN role r '
             + 'ON e.role_id = r.id '
             + 'LEFT JOIN employee m '
-            + 'ON m.id = e.manager_id';
-
-        // var query = 'SELECT e.id as "ID", e.first_name as "First Name", e.last_name as "Last Name",  CONCAT(m.first_name, ", ", m.last_name) AS Manager '
-        // + 'FROM employee e LEFT JOIN employee m '
-        // + 'ON m.id = e.manager_id';
+            + 'ON m.id = e.manager_id '
+            + 'LEFT JOIN department d '
+            + 'ON d.id = r.department_id';
         pool.query(query,
             (err, res) => {
                 if (err) throw err;
@@ -577,18 +577,17 @@ async function viewAllEmployeesByDepartment() {
             });
     });
 }
+
 async function viewAllEmployeesByManager() {
     return new Promise((resolve) => {
 
-        var query = 'SELECT e.id as "ID", e.first_name as "First Name", e.last_name as "Last Name", r.title as "Title", CONCAT(m.first_name, ", ", m.last_name) AS Manager '
+        var query = 'SELECT e.id as "ID", e.first_name as "First Name", e.last_name as "Last Name", d.Name as "Department", r.title as "Title", r.salary as "Salary", CONCAT(m.first_name, " ", m.last_name) AS Manager '
             + 'FROM employee e LEFT JOIN role r '
             + 'ON e.role_id = r.id '
             + 'LEFT JOIN employee m '
-            + 'ON m.id = e.manager_id';
-
-        // var query = 'SELECT e.id as "ID", e.first_name as "First Name", e.last_name as "Last Name",  CONCAT(m.first_name, ", ", m.last_name) AS Manager '
-        // + 'FROM employee e LEFT JOIN employee m '
-        // + 'ON m.id = e.manager_id';
+            + 'ON m.id = e.manager_id '
+            + 'LEFT JOIN department d '
+            + 'ON d.id = r.department_id';
         pool.query(query,
             (err, res) => {
                 if (err) throw err;
@@ -602,15 +601,13 @@ async function viewAllEmployeesByManager() {
 async function viewTotalBudgetByDepartment() {
     return new Promise((resolve) => {
 
-        var query = 'SELECT e.id as "ID", e.first_name as "First Name", e.last_name as "Last Name", r.title as "Title", CONCAT(m.first_name, ", ", m.last_name) AS Manager '
+        var query = 'SELECT e.id as "ID", e.first_name as "First Name", e.last_name as "Last Name", d.Name as "Department", r.title as "Title", r.salary as "Salary", CONCAT(m.first_name, " ", m.last_name) AS Manager '
             + 'FROM employee e LEFT JOIN role r '
             + 'ON e.role_id = r.id '
             + 'LEFT JOIN employee m '
-            + 'ON m.id = e.manager_id';
-
-        // var query = 'SELECT e.id as "ID", e.first_name as "First Name", e.last_name as "Last Name",  CONCAT(m.first_name, ", ", m.last_name) AS Manager '
-        // + 'FROM employee e LEFT JOIN employee m '
-        // + 'ON m.id = e.manager_id';
+            + 'ON m.id = e.manager_id '
+            + 'LEFT JOIN department d '
+            + 'ON d.id = r.department_id';
         pool.query(query,
             (err, res) => {
                 if (err) throw err;
@@ -620,6 +617,7 @@ async function viewTotalBudgetByDepartment() {
             });
     });
 }
+
 //#endregion
 
 //#region generic Prompts
@@ -628,7 +626,14 @@ function getStringPrompt(message) {
         {
             type: "input",
             name: "result",
-            message: message
+            message: message,
+            validate: (value) => {
+                if (!value.trim()) {
+                    console.log(`Please enter a valid input.`)
+                    return false;
+                }
+                return true;
+            }
         }
     ]);
 }
@@ -639,7 +644,14 @@ function getDefaultStringPrompt(message, defaultValue) {
             type: "input",
             name: "result",
             default: defaultValue,
-            message: message
+            message: message,
+            validate: (value) => {
+                if (!value.trim()) {
+                    console.log(`Please enter a valid input.`)
+                    return false;
+                }
+                return true;
+            }
         }
     ]);
 }
@@ -671,6 +683,10 @@ function getDepartmentStringPrompt(message, list) {
                     console.log(`\nPlease enter a unique Department. ${value} is already added.`)
                     return false;
                 }
+                if (!value.trim()) {
+                    console.log(`Please enter a valid Name.`)
+                    return false;
+                }
                 return true;
             }
         }
@@ -688,6 +704,10 @@ function getDepartmentDefaultStringPrompt(message, defaultValue, list) {
                 const found = list.some(item => item.name === value);
                 if (found.length > 1) {
                     console.log(`\nPlease enter a unique Department. ${value} is already added.`)
+                    return false;
+                }
+                if (!value.trim()) {
+                    console.log(`Please enter a valid Name.`)
                     return false;
                 }
                 return true;
@@ -743,6 +763,10 @@ function getRoleStringPrompt(message, list) {
                     console.log(`\nPlease enter a unique Role. ${value} is already added.`)
                     return false;
                 }
+                if (!value.trim()) {
+                    console.log(`Please enter a valid Title.`)
+                    return false;
+                }
                 return true;
             }
         }
@@ -762,6 +786,10 @@ function getRoleDefaultStringPrompt(message, defaultValue, list) {
                     console.log(`\nPlease enter a unique Role. ${value} is already added.`)
                     return false;
                 }
+                if (!value.trim()) {
+                    console.log(`Please enter a valid Title.`)
+                    return false;
+                }
                 return true;
             }
         }
@@ -769,3 +797,19 @@ function getRoleDefaultStringPrompt(message, defaultValue, list) {
 }
 //#endregion
 
+function welcomeScreen() {
+    console.log("____________________________________________________");
+    console.log("|   _____                 _                        |");
+    console.log("|  | ____|_ __ ___  _ __ | | ___  _   _  ___  ___  |");
+    console.log("|  |  _| | '_ ` _ \\| '_ \\| |/ _ \\| | | |/ _ \\/ _ \\ |");
+    console.log("|  | |___| | | | | | |_) | | (_) | |_| |  __/  __/ |");
+    console.log("|  |_____|_| |_| |_| .__/|_|\\___/ \\__. |\\___|\\___| |");
+    console.log("|                  |_|           |____/            |");
+    console.log("|   __  __                                         |");
+    console.log("|  |  \\/  | __ _ _ __   __ _  __ _  ___ _ __       |");
+    console.log("|  | |\\/| |/ _` | '_ \\ / _` |/ _` |/ _ \\ '__|      |");
+    console.log("|  | |  | | (_| | | | | (_| | (_| |  __/ |         |");
+    console.log("|  |_|  |_|\\__,_|_| |_|\\__,_|\\__, |\\___|_|         |");
+    console.log("|                            |___/                 |");
+    console.log("|__________________________________________________|");
+}
