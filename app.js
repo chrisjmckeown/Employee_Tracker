@@ -1,10 +1,9 @@
+const mysql = require('mysql');
 const inquirer = require('inquirer');
 const manageDepartments = require('./selections/manageDepartments');
 const manageRoles = require('./selections/manageRoles');
 const manageEmployees = require('./selections/manageEmployees');
 const viewReports = require('./selections/viewReports');
-const mysql = require('mysql');
-const table = require('console.table');
 
 const databaseConfig = {
     host: "localhost",
@@ -22,10 +21,10 @@ async function start() {
         const { selection } = await primarySelectionPrompt();
         switch (selection) {
             case "Manage Departments":
-                await manageDepartments(pool);
+                await manageDepartments.manageDepartments(pool);
                 break;
             case "Manage Roles":
-               await manageRoles(pool);
+                await manageRoles.manageRoles(pool);
                 break;
             case "Manage Employees":
                 await manageEmployees(pool);
@@ -55,25 +54,6 @@ function primarySelectionPrompt() {
             ]
         }
     ]);
-}
-
-async function viewAllEmployeesByDepartment() {
-    return new Promise((resolve) => {
-
-        var query = 'SELECT d.Name as "Department", e.first_name as "First Name", e.last_name as "Last Name" '
-            + 'FROM department d LEFT JOIN role r '
-            + 'ON d.id = r.department_id '
-            + 'LEFT JOIN employee e '
-            + 'ON r.id = e.role_id '
-            + 'ORDER BY d.Name';
-        pool.query(query,
-            (err, res) => {
-                if (err) throw err;
-                console.log("\nEmployees By Department\n");
-                console.table(res);
-                resolve({ result: !err });
-            });
-    });
 }
 
 function welcomeScreen() {

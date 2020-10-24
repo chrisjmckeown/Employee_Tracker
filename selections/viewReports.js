@@ -1,20 +1,18 @@
 const inquirer = require('inquirer');
 const table = require('console.table');
-let pool;
 
-async function viewReports(mysqlpool) {
-    pool =mysqlpool;
+async function viewReports(pool) {
     while (true) {
         const { selection } = await vewSelectionPrompt();
         switch (selection) {
             case "View All Employees By Department":
-                await viewAllEmployeesByDepartment();
+                await viewAllEmployeesByDepartment(pool);
                 break;
             case "View All Employees By Manager":
-                await viewAllEmployeesByManager();
+                await viewAllEmployeesByManager(pool);
                 break;
             case "View Total Budget By Department":
-                await viewTotalBudgetByDepartment();
+                await viewTotalBudgetByDepartment(pool);
                 break;
             default:
                 return;
@@ -41,7 +39,7 @@ function vewSelectionPrompt() {
 //#endregion
 
 //#region View Reports mySQL
-async function viewAllEmployeesByDepartment() {
+async function viewAllEmployeesByDepartment(pool) {
     return new Promise((resolve) => {
 
         var query = 'SELECT d.Name as "Department", e.first_name as "First Name", e.last_name as "Last Name" '
@@ -60,7 +58,7 @@ async function viewAllEmployeesByDepartment() {
     });
 }
 
-async function viewAllEmployeesByManager() {
+async function viewAllEmployeesByManager(pool) {
     return new Promise((resolve) => {
 
         var query = 'SELECT CONCAT(m.first_name, " ", m.last_name) AS Manager, CONCAT(e.first_name, " ", e.last_name) as Employee  '
@@ -77,7 +75,7 @@ async function viewAllEmployeesByManager() {
     });
 }
 
-async function viewTotalBudgetByDepartment() {
+async function viewTotalBudgetByDepartment(pool) {
     return new Promise((resolve) => {
 
         var query = 'SELECT d.Name as "Department", SUM(r.salary) as "Salary" '
