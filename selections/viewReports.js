@@ -43,9 +43,9 @@ async function viewAllEmployeesByDepartment(pool) {
     return new Promise((resolve) => {
 
         var query = 'SELECT d.Name as "Department", e.first_name as "First Name", e.last_name as "Last Name" '
-            + 'FROM department d LEFT JOIN role r '
+            + 'FROM department d RIGHT JOIN role r '
             + 'ON d.id = r.department_id '
-            + 'LEFT JOIN employee e '
+            + 'RIGHT JOIN employee e '
             + 'ON r.id = e.role_id '
             + 'ORDER BY d.Name';
         pool.query(query,
@@ -79,8 +79,10 @@ async function viewTotalBudgetByDepartment(pool) {
     return new Promise((resolve) => {
 
         var query = 'SELECT d.Name as "Department", SUM(r.salary) as "Salary" '
-            + 'FROM department d LEFT JOIN role r '
+            + 'FROM department d RIGHT JOIN role r '
             + 'ON d.id = r.department_id '
+            + 'RIGHT JOIN employee e '
+            + 'ON r.id = e.role_id '
             + 'GROUP BY d.Name';
         pool.query(query,
             (err, res) => {

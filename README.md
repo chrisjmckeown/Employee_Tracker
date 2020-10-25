@@ -78,10 +78,11 @@ Once installed:
     * Exit CMS (this will exit the CLI)
 
 ### Demonstration
-Click to view the video:
-https://chrisjmckeown.github.io/project_team_generator/
+Click to view a video of the mysql setup:
+[![Video](./Assets/Employee_Tracker_mysql_Setup.png)](https://drive.google.com/file/d/1alrQcJ0D_XXDb2wL4pfRfNdajZv3j6IH/view) 
 
-[![Video](./Assets/Project_Team_Generator_Demo.png)](https://drive.google.com/file/d/1Tpjjg77FdM1ZBVrWrFHGbx_14C7p-rxx/view) 
+Click to view a video of the app:
+[![Video](./Assets/Employee_Tracker_App.png)](https://drive.google.com/file/d/1jGqbpWhD8HiTGCryKMRu-k1tozhRPwKL/view) 
 
 ## License
  
