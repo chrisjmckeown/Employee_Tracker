@@ -39,7 +39,7 @@ function vewSelectionPrompt() {
 //#endregion
 
 //#region View Reports mySQL
-async function viewAllEmployeesByDepartment(pool) {
+function viewAllEmployeesByDepartment(pool) {
     return new Promise((resolve) => {
 
         var query = 'SELECT d.Name as "Department", e.first_name as "First Name", e.last_name as "Last Name" '
@@ -58,7 +58,7 @@ async function viewAllEmployeesByDepartment(pool) {
     });
 }
 
-async function viewAllEmployeesByManager(pool) {
+function viewAllEmployeesByManager(pool) {
     return new Promise((resolve) => {
 
         var query = 'SELECT CONCAT(m.first_name, " ", m.last_name) AS Manager, CONCAT(e.first_name, " ", e.last_name) as Employee  '
@@ -75,7 +75,7 @@ async function viewAllEmployeesByManager(pool) {
     });
 }
 
-async function viewTotalBudgetByDepartment(pool) {
+function viewTotalBudgetByDepartment(pool) {
     return new Promise((resolve) => {
 
         var query = 'SELECT d.Name as "Department", SUM(r.salary) as "Salary" '

@@ -58,7 +58,7 @@ async function getRoleDepartment(pool, department_id) {
 }
 
 //#region Manage Roles mySQL
-async function getAllRoles(pool) {
+function getAllRoles(pool) {
     return new Promise((resolve) => {
         var query = 'SELECT * FROM role ORDER BY title';
         pool.query(query,
@@ -69,7 +69,7 @@ async function getAllRoles(pool) {
     });
 }
 
-async function viewAllRoles(pool) {
+function viewAllRoles(pool) {
     return new Promise((resolve) => {
         var query = 'SELECT role.id as "ID", role.title as "Title", role.salary as "Salary", department.name as "Department Name" '
             + 'FROM role LEFT JOIN department '
@@ -85,7 +85,7 @@ async function viewAllRoles(pool) {
     });
 }
 
-async function addRole(pool, title, salary, department_id) {
+function addRole(pool, title, salary, department_id) {
     return new Promise((resolve) => {
         var query = 'INSERT INTO role SET ?';
         pool.query(query,
@@ -99,7 +99,7 @@ async function addRole(pool, title, salary, department_id) {
     });
 }
 
-async function updateRole(pool, id, title, salary, department_id) {
+function updateRole(pool, id, title, salary, department_id) {
     return new Promise((resolve) => {
         var query = 'UPDATE role SET ? WHERE ?';
         pool.query(query,
@@ -119,7 +119,7 @@ async function updateRole(pool, id, title, salary, department_id) {
     });
 }
 
-async function deleteRole(pool, id) {
+function deleteRole(pool, id) {
     return new Promise((resolve) => {
         var query = 'DELETE FROM role WHERE ?';
         pool.query(query,
@@ -145,7 +145,7 @@ function getSalaryPrompt() {
             name: "result",
             message: "Please enter a Salary:",
             validate: (value) => {
-                if (isNaN(value) === false) {
+                if (isNaN(value) === false && value > 1) {
                     return true;
                 }
                 return false;
@@ -162,7 +162,7 @@ function getSalaryWithDefaultPrompt(defaultValue) {
             default: defaultValue,
             message: "Please enter a Salary:",
             validate: (value) => {
-                if (isNaN(value) === false) {
+                if (isNaN(value) === false && value > 1) {
                     return true;
                 }
                 return false;

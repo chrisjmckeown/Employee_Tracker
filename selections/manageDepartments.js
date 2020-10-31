@@ -34,7 +34,7 @@ async function manageDepartments(pool) {
 }
 
 //#region Manage Department mySQL
-async function getAllDepartments(pool) {
+function getAllDepartments(pool) {
     return new Promise((resolve) => {
         var query = 'SELECT * FROM department ORDER BY name';
         pool.query(query,
@@ -45,7 +45,7 @@ async function getAllDepartments(pool) {
     });
 }
 
-async function viewAllDepartments(pool) {
+function viewAllDepartments(pool) {
     return new Promise((resolve) => {
         var query = 'SELECT id as "ID", name as "Name" FROM department ORDER BY name';
         pool.query(query,
@@ -58,7 +58,7 @@ async function viewAllDepartments(pool) {
     });
 }
 
-async function addDepartment(pool, name) {
+function addDepartment(pool, name) {
     return new Promise((resolve) => {
         var query = 'INSERT INTO department SET ?';
         pool.query(query,
@@ -71,7 +71,7 @@ async function addDepartment(pool, name) {
     });
 }
 
-async function updateDepartment(pool, id, name) {
+function updateDepartment(pool, id, name) {
     return new Promise((resolve) => {
         var query = 'UPDATE department SET ? WHERE ?';
         pool.query(query,
@@ -91,7 +91,7 @@ async function updateDepartment(pool, id, name) {
     });
 }
 
-async function deleteDepartment(pool, id) {
+function deleteDepartment(pool, id) {
     return new Promise((resolve) => {
         var query = 'DELETE FROM department WHERE ?';
         pool.query(query,

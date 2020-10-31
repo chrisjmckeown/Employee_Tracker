@@ -76,7 +76,7 @@ async function getEmployeeRole(pool, role_id) {
 }
 
 //#region Manage Employees mySQL
-async function getAllEmployees(pool) {
+function getAllEmployees(pool) {
     return new Promise((resolve) => {
         var query = 'SELECT * FROM employee';
         pool.query(query,
@@ -87,7 +87,7 @@ async function getAllEmployees(pool) {
     });
 }
 
-async function viewAllEmployees(pool) {
+function viewAllEmployees(pool) {
     return new Promise((resolve) => {
 
         var query = 'SELECT e.id as "ID", e.first_name as "First Name", e.last_name as "Last Name", d.Name as "Department", r.title as "Title", r.salary as "Salary", CONCAT(m.first_name, " ", m.last_name) AS Manager '
@@ -107,7 +107,7 @@ async function viewAllEmployees(pool) {
     });
 }
 
-async function addEmployee(pool, first_name, last_name, role_id, manager_id) {
+function addEmployee(pool, first_name, last_name, role_id, manager_id) {
     return new Promise((resolve) => {
         var query = 'INSERT INTO employee SET ?';
         pool.query(query,
@@ -121,7 +121,7 @@ async function addEmployee(pool, first_name, last_name, role_id, manager_id) {
     });
 }
 
-async function updateEmployee(pool, id, first_name, last_name, role_id, manager_id) {
+function updateEmployee(pool, id, first_name, last_name, role_id, manager_id) {
     return new Promise((resolve) => {
         var query = 'UPDATE employee SET ? WHERE ?';
         pool.query(query,
@@ -141,7 +141,7 @@ async function updateEmployee(pool, id, first_name, last_name, role_id, manager_
     });
 }
 
-async function deleteEmployee(pool, id) {
+function deleteEmployee(pool, id) {
     return new Promise((resolve) => {
         var query = 'DELETE FROM employee WHERE ?';
         pool.query(query,
